@@ -53,15 +53,14 @@ def list_operations():
 
 def tuple_operations():
     my_tuple = ()
-    # Similar operations as lists can be done on tuples, but tuples are immutable
+   
 
 def set_operations():
     my_set = set()
-    # Set operations like add, remove, etc. can be performed
-
+ 
 def dictionary_operations():
     my_dict = {}
-    # Dictionary operations like insert, update, delete, etc. can be performed
+  
 
 while True:
     choice = display_menu()
