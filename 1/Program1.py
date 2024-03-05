@@ -53,14 +53,86 @@ def list_operations():
 
 def tuple_operations():
     my_tuple = ()
-   
+    while True:
+        print("\nTuple Operations:")
+        print("1. Display")
+        print("2. Back to main menu")
+        choice = int(input("Enter your choice: "))
+        if choice == 1:
+            print("Tuple:", my_tuple)
+        elif choice == 2:
+            break
+        else:
+            print("Invalid choice!")
+
 
 def set_operations():
     my_set = set()
- 
+    while True:
+        print("\nSet Operations:")
+        print("1. Add")
+        print("2. Remove")
+        print("3. Display")
+        print("4. Back to main menu")
+        choice = int(input("Enter your choice: "))
+        if choice == 1:
+            item = input("Enter item to add: ")
+            my_set.add(item)
+        elif choice == 2:
+            item = input("Enter item to remove: ")
+            if item in my_set:
+                my_set.remove(item)
+            else:
+                print("Item not found!")
+        elif choice == 3:
+            print("Set:", my_set)
+        elif choice == 4:
+            break
+        else:
+            print("Invalid choice!")
+
+
 def dictionary_operations():
     my_dict = {}
-  
+    while True:
+        print("\nDictionary Operations:")
+        print("1. Insert")
+        print("2. Update")
+        print("3. Delete")
+        print("4. Display")
+        print("5. Search")
+        print("6. Back to main menu")
+        choice = int(input("Enter your choice: "))
+        if choice == 1:
+            key = input("Enter key: ")
+            value = input("Enter value: ")
+            my_dict[key] = value
+        elif choice == 2:
+            key = input("Enter key to update: ")
+            if key in my_dict:
+                new_value = input("Enter new value: ")
+                my_dict[key] = new_value
+            else:
+                print("Key not found!")
+        elif choice == 3:
+            key = input("Enter key to delete: ")
+            if key in my_dict:
+                del my_dict[key]
+            else:
+                print("Key not found!")
+        elif choice == 4:
+            print("Dictionary:", my_dict)
+        elif choice == 5:
+            key = input("Enter key to search: ")
+            if key in my_dict:
+                print("Value:", my_dict[key])
+            else:
+                print("Key not found!")
+        elif choice == 6:
+            break
+        else:
+            print("Invalid choice!")
+
 
 while True:
     choice = display_menu()
