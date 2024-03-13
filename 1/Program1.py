@@ -38,10 +38,11 @@ def list_operations():
         elif choice == 4:
             print("List:", my_list)
         elif choice == 5:
+            my_list = [int(x) for x in my_list] 
             my_list.sort()
             print("Sorted list:", my_list)
         elif choice == 6:
-            item = input("Enter item to search: ")
+            item = int(input("Enter item to search: "))
             if item in my_list:
                 print("Item found at index", my_list.index(item))
             else:
