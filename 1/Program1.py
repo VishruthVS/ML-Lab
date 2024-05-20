@@ -55,16 +55,18 @@ def list_operations():
 def tuple_operations():
     my_tuple = ()
     while True:
+        print("\nEnter tuple:")
+        my_tuple = tuple(i for i in input().split())
         print("\nTuple Operations:")
         print("1. Display")
         print("2. Back to main menu")
-        choice = int(input("Enter your choice: "))
+        choice = int(input("Enter your choice:"))
         if choice == 1:
-            print("Tuple:", my_tuple)
+            print("Tuple: ", my_tuple)
         elif choice == 2:
             break
         else:
-            print("Invalid choice!")
+            print("Invalid choice")
 
 
 def set_operations():
