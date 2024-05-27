@@ -1,33 +1,71 @@
-MAX, MIN = 1000, -1000
 
-def alphabeta_minimax(depth, nodeIndex, maximizingPlayer, values, alpha, beta):
+class TreeNode:
+    def __init__(self, value, children=[]):
+        self.value = value
+        self.children = children
+        self.alpha = float('-inf')
+        self.beta = float('inf')
 
-	if depth == 3:
-		return values[nodeIndex]
+def alphabeta(node, depth, alpha, beta, maximizing_player):
+    global pruned_count
 
-	if maximizingPlayer:
-		best = MIN
-		for i in range(0, 2):
-			val = alphabeta_minimax(depth + 1, nodeIndex * 2 + i, False, values, alpha, beta)
-			best = max(best, val)
-			alpha = max(alpha, best)
+    if depth == 0 or not node.children:
+        return node.value, [node.value]
 
-			if beta <= alpha:
-				break
-		return best
+    if maximizing_player:
+        max_value = float("-inf")
+        max_path = []
+        for child_node in node.children:
+            child_value, child_path = alphabeta(child_node, depth - 1, alpha, beta, False)
+            if child_value > max_value:
+                max_value = child_value
+                max_path = [node.value] + child_path
 
-	else:
-		best = MAX
-		for i in range(0, 2):
-			val = alphabeta_minimax(depth + 1, nodeIndex * 2 + i, True, values, alpha, beta)
-			best = min(best, val)
-			beta = min(beta, best)
+            alpha = max(alpha, max_value)
+            if alpha >= beta:
+                pruned_count+=len(child_node.children)+1
+                break
 
-			if beta <= alpha:
-				break
+        return max_value, max_path
 
-		return best
+    else:
+        min_value = float("inf")
+        min_path = []
+        for child_node in node.children:
+            child_value, child_path = alphabeta(child_node, depth - 1, alpha, beta, True)
+            if child_value < min_value:
+                min_value = child_value
+                min_path = [node.value] + child_path
+
+            beta = min(beta, min_value)
+            if alpha >= beta:
+                pruned_count+=len(child_node.children)+1
+                break
+
+        return min_value, min_path
 
 
-values = [3, 5, 6, 9, 1, 2, 0, -1]
-print("The optimal value is :", alphabeta_minimax(0, 0, True, values, MIN, MAX))
+game_tree = TreeNode(0, [
+    TreeNode(0, [
+        TreeNode(0,[
+            TreeNode(3), TreeNode(5)
+            ]),
+        TreeNode(0,[
+            TreeNode(6), TreeNode(9)
+            ])
+        ]),
+    TreeNode(0, [
+        TreeNode(0,[
+            TreeNode(1), TreeNode(2)
+            ]),
+        TreeNode(0,[
+            TreeNode(0), TreeNode(-1)
+            ])
+        ])
+])
+
+pruned_count = 0
+optimal_value, optimal_path = alphabeta(game_tree, 3, float('-inf'), float('inf'), True)
+
+print("Optimal value:", optimal_value)
+print("Total pruned nodes:", pruned_count)
