@@ -1,3 +1,5 @@
+# Without using keras
+
 import numpy as np
 
 # Activation function (sigmoid) and its derivative
