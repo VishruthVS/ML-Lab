@@ -1,41 +1,43 @@
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
 
 class NaiveBayesClassifier:
-  def __init__(self):
-    self.prior = {}
-    self.conditional = {}
+    def __init__(self):
+        self.prior = {}
+        self.conditional = {}
 
-  def fit(self, X, y):
-    self.classes = np.unique(y)
-    for c in self.classes:
-      self.prior[c] = np.mean(y == c)
+    def fit(self, X, y):
+        self.classes = np.unique(y)
+        for c in self.classes:
+            self.prior[c] = np.mean(y == c)
 
-    for feature in X.columns:
-      self.conditional[feature] = {}
-      for c in self.classes:
-        feature_values = X[feature][y == c]
-        self.conditional[feature][c] = { 'mean': np.mean(feature_values),'std': np.std(feature_values) }
-
-  def predict(self, X):
-    y_pred = []
-    for _, sample in X.iterrows():
-      probabilities = {}
-      for c in self.classes:
-        probabilities[c] = self.prior[c]
         for feature in X.columns:
-          mean = self.conditional[feature][c]['mean']
-          std = self.conditional[feature][c]['std']
-          x = sample[feature]
-          probabilities[c] *= self._gaussian_pdf(x, mean, std)
-      y_pred.append(max(probabilities, key=probabilities.get))
-    return y_pred
+            self.conditional[feature] = {}
+            for c in self.classes:
+                feature_values = X[feature][y == c]
+                self.conditional[feature][c] = {'mean': np.mean(feature_values), 'std': np.std(feature_values)}
 
-  def _gaussian_pdf(self, x, mean, std):
-    exponent = np.exp(-((x - mean) ** 2) / (2 * std ** 2))
-    return (1 / (np.sqrt(2 * np.pi) * std)) * exponent
+    def predict(self, X):
+        y_pred = []
+        for _, sample in X.iterrows():
+            probabilities = {}
+            for c in self.classes:
+                probabilities[c] = self.prior[c]
+                for feature in X.columns:
+                    mean = self.conditional[feature][c]['mean']
+                    std = self.conditional[feature][c]['std']
+                    x = sample[feature]
+                    probabilities[c] *= self._gaussian_pdf(x, mean, std)
+            y_pred.append(max(probabilities, key=probabilities.get))
+        return y_pred
+
+    def _gaussian_pdf(self, x, mean, std):
+        exponent = np.exp(-((x - mean) ** 2) / (2 * std ** 2))
+        return (1 / (np.sqrt(2 * np.pi) * std)) * exponent
 
 df = pd.read_csv('titanic.csv')
 df = df[['Survived', 'Pclass', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked']]
@@ -59,3 +61,10 @@ cm = confusion_matrix(y_test, y_pred)
 print("Confusion Matrix:\n", cm)
 accuracy = np.mean(y_pred == y_test)
 print("Accuracy:", accuracy)
+
+plt.figure(figsize=(10, 7))
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['Not Survived', 'Survived'], yticklabels=['Not Survived', 'Survived'])
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.title('Confusion Matrix')
+plt.show()
