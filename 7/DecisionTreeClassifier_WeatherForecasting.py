@@ -1,41 +1,56 @@
 import pandas as pd
-from sklearn.metrics import accuracy_score
-from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeClassifier
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.preprocessing import OneHotEncoder
 
-data = pd.read_csv('./daily_weather.csv')
+file_path = "weather_forecast.csv"
+df = pd.read_csv(file_path)
 
-data.columns
-data[data.isnull().any(axis=1)].head()
-del data['number']
+print(df.head())
+encoder = OneHotEncoder(drop='first')
+X_encoded = encoder.fit_transform(df.drop('Play', axis=1)).toarray()
+y = df['Play']
 
-before_rows = data.shape[0]
-print(before_rows)
+X_train, X_test, y_train, y_test = train_test_split(X_encoded, y, test_size=0.2, random_state=42)
 
-data = data.dropna()
-after_rows = data.shape[0]
-print(after_rows)
-before_rows - after_rows
-clean_data = data.copy()
-clean_data['high_humidity_label'] = (clean_data['relative_humidity_3pm'] >24.99) *1
-clean_data['high_humidity_label'].head()
-y = clean_data[['high_humidity_label']].copy()
-y.head()
-clean_data['relative_humidity_3pm'].head()
-y.head()
+clf_id3 = DecisionTreeClassifier(criterion='entropy', random_state=42)
+clf_id3.fit(X_train, y_train)
 
-morning_features = ['air_pressure_9am', 'air_temp_9am', 'avg_wind_direction_9am',
-       'avg_wind_speed_9am', 'max_wind_direction_9am', 'max_wind_speed_9am',
-       'rain_accumulation_9am', 'rain_duration_9am', 'relative_humidity_9am']
+plt.figure(figsize=(12, 8))
+plot_tree(clf_id3, filled=True, feature_names=encoder.get_feature_names_out(['Outlook', 'Temperature', 'Humidity', 'Windy']), class_names=['No', 'Yes'])
+plt.show()
 
-x=clean_data[morning_features].copy()
-x.columns
-y.columns
-X_train,X_test,y_train,y_test = train_test_split(x,y,test_size=0.33,random_state=324)
-humidity_classifier = DecisionTreeClassifier(max_leaf_nodes=10,random_state=0)
-humidity_classifier.fit(X_train,y_train)
+y_pred_id3 = clf_id3.predict(X_test)
 
-y_predicted = humidity_classifier.predict(X_test)
-y_predicted[:10]
-y_test['high_humidity_label'][:10]
-accuracy_score(y_test,y_predicted)*100
+accuracy_id3 = accuracy_score(y_test, y_pred_id3)
+report_id3 = classification_report(y_test, y_pred_id3)
+
+print("ID3 Algorithm Results:")
+print(f"Accuracy: {accuracy_id3}")
+print(f"Classification Report:\n{report_id3}")
+
+cv_scores_id3 = cross_val_score(clf_id3, X_encoded, y, cv=5)
+print("Cross-Validation Scores (ID3):", cv_scores_id3)
+print("Mean CV Accuracy (ID3):", cv_scores_id3.mean())
+
+clf_cart = DecisionTreeClassifier(criterion='gini', random_state=42)
+clf_cart.fit(X_train, y_train)
+
+plt.figure(figsize=(12, 8))
+plot_tree(clf_cart, filled=True, feature_names=encoder.get_feature_names_out(['Outlook', 'Temperature', 'Humidity', 'Windy']), class_names=['No', 'Yes'])
+plt.show()
+
+y_pred_cart = clf_cart.predict(X_test)
+
+accuracy_cart = accuracy_score(y_test, y_pred_cart)
+report_cart = classification_report(y_test, y_pred_cart)
+
+print("CART Algorithm Results:")
+print(f"Accuracy: {accuracy_cart}")
+print(f"Classification Report:\n{report_cart}")
+
+cv_scores_cart = cross_val_score(clf_cart, X_encoded, y, cv=5)
+print("Cross-Validation Scores (CART):", cv_scores_cart)
+print("Mean CV Accuracy (CART):", cv_scores_cart.mean())
